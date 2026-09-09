@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CP Group Education &amp; Inequality Reduction Dashboard</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" sizes="180x180" href="icon.png">
+<link rel="icon" type="image/png" href="icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="CP HEART">
+<meta name="theme-color" content="#faf7f8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0d0d0d" media="(prefers-color-scheme: dark)">
+<style>
+:root{
+  color-scheme: light;
+  --surface-1:      #fdfbfc;
+  --page-plane:     #faf7f8;
+  --text-primary:   #0b0b0b;
+  --text-secondary: #55504f;
+  --text-muted:     #797372;
+  --border:         rgba(11,11,11,0.10);
+  --surface-alt:    #f1e9eb;
+
+  --shade0: #4a0f2e;
+  --shade1: #7a1442;
+  --shade2: #a01e59;
+  --shade3: #d1447e;
+  --shade4: #ff6699;
+  --shade5: #ff9dbf;
+  --shade6: #ffc2d6;
+  --shade7: #ffe1ec;
+  --accent: var(--shade2);
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --surface-1:      #1c1a1b;
+  --page-plane:     #0d0d0d;
+  --text-primary:   #ffffff;
+  --text-secondary: #cdc0c4;
+  --text-muted:     #948b8a;
+  --border:         rgba(255,255,255,0.10);
+  --surface-alt:    #262223;
+
+  --shade0: #ffe1ec;
+  --shade1: #ffc2d6;
+  --shade2: #ff9dbf;
+  --shade3: #ff6699;
+  --shade4: #d1447e;
+  --shade5: #a01e59;
+  --shade6: #7a1442;
+  --shade7: #4a0f2e;
+  --accent: var(--shade3);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme: dark;
+    --surface-1:      #1c1a1b;
+    --page-plane:     #0d0d0d;
+    --text-primary:   #ffffff;
+    --text-secondary: #cdc0c4;
+    --text-muted:     #948b8a;
+    --border:         rgba(255,255,255,0.10);
+    --surface-alt:    #262223;
+
+    --shade0: #ffe1ec;
+    --shade1: #ffc2d6;
+    --shade2: #ff9dbf;
+    --shade3: #ff6699;
+    --shade4: #d1447e;
+    --shade5: #a01e59;
+    --shade6: #7a1442;
+    --shade7: #4a0f2e;
+    --accent: var(--shade3);
+  }
+}
+
+*{ box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html,body{ margin:0; padding:0; }
+body{
+  background: var(--page-plane);
+  color: var(--text-primary);
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans Thai",sans-serif;
+  min-height: 100vh;
+}
+.app{ max-width: 560px; margin: 0 auto; padding: 0 0 48px; }
+@media (min-width:700px){ .app{ max-width: 920px; } }
+@media (min-width:1200px){ .app{ max-width: 1240px; } }
+header{
+  position: sticky; top:0; z-index: 20;
+  display:flex; align-items:center; justify-content:space-between; gap:8px;
+  padding: 12px 14px 10px; background: var(--page-plane);
+}
+.back-btn{
+  width:36px; height:36px; border-radius:10px; border:1px solid var(--border);
+  background: var(--surface-1); color: var(--text-primary);
+  font-size:18px; display:flex; align-items:center; justify-content:center;
+  cursor:pointer; flex:none; text-decoration:none;
+}
+header .titles{ flex:1; min-width:0; }
+header h1{ font-size: 16px; font-weight: 700; margin:0; line-height:1.3; }
+header .sub{ font-size: 11.5px; color: var(--text-muted); font-weight:400; margin-top:2px; }
+.theme-btn{
+  width:36px; height:36px; border-radius:10px; border:1px solid var(--border);
+  background: var(--surface-1); color: var(--text-primary);
+  font-size:16px; display:flex; align-items:center; justify-content:center; cursor:pointer; flex:none;
+}
+.section{ padding: 14px 16px 4px; }
+.section-title{
+  font-size: 13px; font-weight:700; text-transform:uppercase; letter-spacing:.04em;
+  color: var(--text-secondary); margin:0 0 10px;
+}
+.card{
+  background: var(--surface-1); border:1px solid var(--border); border-radius:16px;
+  padding:16px; margin-bottom:12px; box-shadow:0 1px 3px rgba(0,0,0,.04);
+}
+
+/* ---- Hero KPI ring ---- */
+.hero-kpi{ display:flex; align-items:center; gap:18px; }
+.ring{
+  --pct:0; --ring-color:var(--accent); --ring-track:var(--surface-alt); --size:112px; --thick:12px;
+  width:var(--size); height:var(--size); border-radius:50%; flex:none;
+  background: conic-gradient(var(--ring-color) calc(var(--pct)*1%), var(--ring-track) 0);
+  display:flex; align-items:center; justify-content:center; position:relative;
+}
+.ring::before{ content:""; position:absolute; inset:var(--thick); border-radius:50%; background:var(--surface-1); }
+.ring .val{ position:relative; z-index:1; font-weight:800; font-size:22px; }
+.hero-kpi .meta{ flex:1; min-width:0; }
+.hero-kpi .meta .label{ font-size:13px; color:var(--text-secondary); font-weight:600; margin-bottom:6px; }
+.hero-kpi .meta .target{
+  display:inline-flex; gap:6px; align-items:baseline; font-size:12px; color:var(--text-muted);
+  background:var(--surface-alt); padding:4px 10px; border-radius:999px;
+}
+.hero-kpi .meta .target b{ color:var(--text-primary); font-size:13px; }
+
+/* ---- Trend bars (by year) ---- */
+.trend-scroll{ overflow-x:auto; margin:0 -16px; padding:0 16px 6px; -webkit-overflow-scrolling:touch; }
+.trend-row{ display:flex; align-items:flex-end; gap:12px; min-width:max-content; }
+.trend-col{ display:flex; flex-direction:column; align-items:center; width:46px; flex:none; }
+.trend-bar-wrap{ height:120px; display:flex; align-items:flex-end; }
+.trend-bar{ width:24px; border-radius:5px 5px 2px 2px; background:var(--accent); opacity:.55; }
+.trend-col.is-last .trend-bar{ opacity:1; }
+.trend-val{ font-size:9.5px; font-weight:700; margin-bottom:4px; white-space:nowrap; }
+.trend-year{ font-size:10px; color:var(--text-muted); margin-top:6px; }
+
+/* ---- Bar list (category / country) ---- */
+.bar-list{ display:flex; flex-direction:column; gap:12px; }
+.bar-row2{ display:flex; flex-direction:column; gap:5px; }
+.bar-row2-top{ display:flex; justify-content:space-between; gap:8px; font-size:12px; }
+.bar-row2-top .name{ color:var(--text-secondary); }
+.bar-row2-top .val{ font-weight:700; color:var(--text-primary); flex:none; }
+.bar-row2-track{ height:9px; border-radius:5px; background:var(--surface-alt); overflow:hidden; }
+.bar-row2-fill{ height:100%; border-radius:5px; background:var(--accent); }
+
+/* ---- Stat tiles ---- */
+.stat-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
+.stat-tile{ background:var(--surface-alt); border-radius:12px; padding:14px 12px; }
+.stat-tile .n{ font-size:20px; font-weight:800; color:var(--accent); }
+.stat-tile .l{ font-size:11px; color:var(--text-muted); margin-top:4px; line-height:1.3; }
+
+/* ---- Program list ---- */
+.prog-list{ display:flex; flex-direction:column; gap:0; }
+.prog-item{ display:flex; justify-content:space-between; align-items:center; gap:10px;
+  padding:11px 0; border-bottom:1px dashed var(--border); }
+.prog-item:last-child{ border-bottom:none; }
+.prog-item .name{ font-size:12.5px; color:var(--text-primary); font-weight:600; }
+.prog-item .metric{ font-size:11.5px; color:var(--text-muted); text-align:right; flex:none; }
+
+.soon{
+  display:flex; gap:12px; align-items:flex-start; padding:14px 4px 4px; color:var(--text-secondary); font-size:13px; line-height:1.6;
+}
+.soon .ico{ flex:none; width:34px; height:34px; border-radius:10px; background:var(--surface-alt); display:flex; align-items:center; justify-content:center; font-size:16px; }
+
+.source-note{ padding:14px 16px 0; font-size:10.5px; color:var(--text-muted); line-height:1.5; text-align:center; }
+
+/* ---- KPI summary (ED-01..ED-08) ---- */
+.kpi-group{ margin-bottom:14px; }
+.kpi-group:last-child{ margin-bottom:0; }
+.kpi-group-head{ display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+.kpi-code{ font-size:10.5px; font-weight:800; color:#fff; background:var(--accent); padding:3px 8px; border-radius:999px; flex:none; }
+.kpi-group-title{ font-size:12.5px; font-weight:700; color:var(--text-primary); }
+.kpi-metric{ display:flex; justify-content:space-between; align-items:baseline; gap:10px; padding:7px 0; border-bottom:1px dashed var(--border); }
+.kpi-metric:last-child{ border-bottom:none; }
+.kpi-metric .l{ font-size:11.5px; color:var(--text-secondary); line-height:1.35; }
+.kpi-metric .v{ font-size:12.5px; font-weight:800; color:var(--text-primary); flex:none; white-space:nowrap; }
+
+/* ---- Tabs ---- */
+.tabs{
+  display:flex; gap:6px; padding:6px; margin:0 16px 4px;
+  background:var(--surface-1); border:1px solid var(--border); border-radius:12px;
+}
+.tab-btn{
+  flex:1; border:none; background:transparent; color:var(--text-secondary);
+  font-size:13px; font-weight:700; padding:9px 6px; border-radius:9px;
+  cursor:pointer; font-family:inherit;
+}
+.tab-btn[aria-selected="true"]{ background:var(--accent); color:#fff; }
+.tabpanel{ display:none; }
+.tabpanel.active{ display:block; }
+
+/* ---- Business Unit picker ---- */
+.region-row{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px; }
+.region-chip{
+  border:1px solid var(--border); background:var(--page-plane); color:var(--text-secondary);
+  font-size:11.5px; font-weight:700; padding:6px 13px; border-radius:999px;
+  cursor:pointer; font-family:inherit;
+}
+.region-chip[aria-pressed="true"]{ background:var(--accent); border-color:var(--accent); color:#fff; }
+.bu-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(84px,1fr)); gap:10px; }
+.bu-tile{
+  display:flex; flex-direction:column; align-items:center; gap:6px;
+  border:1.5px solid var(--border); background:var(--page-plane); color:var(--text-secondary);
+  border-radius:12px; padding:10px 6px 9px; cursor:pointer; font-family:inherit;
+}
+.bu-tile[aria-pressed="true"]{ border-color:var(--accent); background:color-mix(in oklab, var(--accent) 12%, var(--page-plane)); }
+.bu-tile-logo{
+  height:34px; width:56px; display:flex; align-items:center; justify-content:center;
+  background:#fff; border-radius:8px; padding:4px; flex:none;
+}
+.bu-tile-logo img{ max-width:100%; max-height:100%; object-fit:contain; }
+.bu-tile-fallback{ background:var(--accent); color:#fff; font-weight:700; font-size:11px; }
+.bu-tile-name{ font-size:10.5px; font-weight:600; text-align:center; line-height:1.25; color:var(--text-secondary); }
+.bu-tile[aria-pressed="true"] .bu-tile-name{ color:var(--text-primary); }
+
+/* ---- BU comparison / detail bars ---- */
+.bu-scroll{ overflow-x:auto; margin:0 -16px; padding:0 16px 6px; -webkit-overflow-scrolling:touch; }
+.bu-row{ display:flex; align-items:flex-start; gap:8px; min-width:max-content; }
+.bu-col{ display:flex; flex-direction:column; align-items:center; width:50px; flex:none; }
+.bu-bar-wrap{ height:92px; display:flex; align-items:flex-end; }
+.bu-bar{ width:22px; border-radius:5px 5px 2px 2px; background:var(--accent); }
+.bu-pct{ font-size:9.5px; font-weight:700; margin-bottom:4px; white-space:nowrap; }
+.bu-mark{
+  width:44px; height:27px; border-radius:5px; background:#fff; border:1px solid var(--border);
+  display:flex; align-items:center; justify-content:center; padding:2px; margin-top:6px; flex:none; overflow:hidden;
+}
+.bu-mark img{ max-width:100%; max-height:100%; object-fit:contain; display:block; }
+.bu-name{ font-size:9.5px; color:var(--text-muted); margin-top:6px; text-align:center; line-height:1.15;
+  max-width:56px; overflow-wrap:anywhere; }
+
+.bu-detail-head{ display:flex; align-items:center; gap:12px; margin-bottom:16px; }
+.bu-detail-head .bu-mark{ width:46px; height:30px; margin-top:0; flex:none; }
+.bu-detail-head .nm{ font-size:15px; font-weight:800; line-height:1.25; }
+.bu-detail-head .rg{ font-size:11px; color:var(--text-muted); margin-top:2px; }
+.bu-nodata{ font-size:12px; color:var(--text-muted); padding:10px 2px 4px; }
+.mini-h{ font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.03em; color:var(--text-muted); margin:0 0 10px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <a class="back-btn" href="index.html" aria-label="Back">&larr;</a>
+    <div class="titles">
+      <h1>Education &amp; Inequality Reduction</h1>
+      <div class="sub">HEART &middot; Reach 2017&ndash;2025</div>
+    </div>
+    <button class="theme-btn" id="themeBtn" aria-label="Toggle theme">&#9788;</button>
+  </header>
+
+  <div class="section" style="padding-bottom:0;">
+    <nav class="tabs" role="tablist">
+      <button class="tab-btn" role="tab" aria-selected="true" data-tab="summary">Summary</button>
+      <button class="tab-btn" role="tab" aria-selected="false" data-tab="bu">Business Unit</button>
+    </nav>
+  </div>
+
+  <section class="tabpanel active" id="panel-summary">
+
+  <div class="section">
+    <div class="card">
+      <div class="hero-kpi">
+        <div class="ring" id="heroRing"><span class="val" id="heroVal">0%</span></div>
+        <div class="meta">
+          <div class="label">People supported through education (cumulative)</div>
+          <div class="target">2030 Goal <b id="goalChip">&ndash;</b></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Cumulative Reach by Year</div>
+    <div class="card">
+      <div class="trend-scroll">
+        <div class="trend-row" id="trendRow"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">By Support Category &middot; 2025</div>
+    <div class="card">
+      <div class="bar-list" id="catList"></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">By Country &middot; 2025</div>
+    <div class="card">
+      <div class="bar-list" id="countryList"></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">2025 Community Impact</div>
+    <div class="card">
+      <div class="stat-grid" id="impactGrid"></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Flagship Programs &amp; Platforms</div>
+    <div class="card">
+      <div class="prog-list" id="progList"></div>
+    </div>
+  </div>
+
+  <div class="source-note">
+    Source: 00-Recal Education Accumulated2025.xlsx (GLOBAL &amp; Platform sheets) &middot; CPG Sustainability Performance 2025 (v.2026.08.30).
+  </div>
+
+  </section>
+
+  <section class="tabpanel" id="panel-bu">
+    <div class="section">
+      <div class="section-title">Business Unit &middot; Yearly Trend (2017&ndash;2025)</div>
+      <div class="card">
+        <div class="region-row" id="regionRow"></div>
+        <div class="bu-grid" id="buGrid"></div>
+      </div>
+    </div>
+
+    <div class="section" id="buDetailSection" style="display:none;">
+      <div class="card" id="buDetailCard"></div>
+    </div>
+
+    <div class="section" id="buEmptySection">
+      <div class="card">
+        <div class="soon">
+          <div class="ico">&#128073;</div>
+          <div>เลือกหน่วยธุรกิจด้านบนเพื่อดูแนวโน้มรายปี 2017&ndash;2025: จำนวนพนักงานที่ทำกิจกรรมจิตอาสา ชั่วโมงจิตอาสา จำนวนคนที่ได้งานประจำหลังจบหลักสูตร และมูลค่าทุนการศึกษาที่มอบให้</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="source-note">
+      Source: 00-Recal Education Accumulated2025.xlsx (THAILAND / CHINA / OTHER / CPF sheets, per-BU 2017&ndash;2025 columns) &middot; CPG Sustainability Performance 2025 (v.2026.08.30). Broken down by key-initiative code ED-01&ndash;ED-08. CPF combines its Thailand and Oversea columns (matching the CPF sheet's own total). China shown group-wide (all regional sub-units combined); several small BUs have no recorded activity in the source data for a given year.
+    </div>
+  </section>
+</div>
+
+<script>
+// BU brand marks, shared with the Home pillar's Business Unit picker (template_home/ghg.html,
+// waste.html, water.html) and the Cybersecurity dashboard. A BU absent here simply has no logo
+// and renders as an initials fallback -- never guess a logo.
+const BU_LOGO = {
+  "AERA1":"aera1",
+  "Ascend":"ascend","ASCEND":"ascend","ASCEND (Thailand)":"ascend",
+  "Advance AQ":"advance-aq","Advance AG":"advance-ag","Advance : AG":"advance-ag","Advance : AQ":"advance-aq","Advance":"advance",
+  "All Now Group":"all-now","ALL NOW":"all-now",
+  "Altervim":"altervim",
+  "CHIATAI":"chia-tai","CHIA TAI":"chia-tai",
+  "CPLI":"cpli",
+  "CPPC":"cppc","CPPC (Thailand)":"cppc",
+  "CPCRT":"cpcrt","CP CRT":"cpcrt","CPCRT (CPA+CPE+CPI+CPP)":"cpcrt","CPI":"cpcrt",
+  "KPI-KSP":"ksp-kpi","KASETPHAND":"ksp-kpi",
+  "PCG":"pcg",
+  "CP LAND":"cp-land","CPLAND":"cp-land",
+  "CP ALL":"cp-all","CP ALL (Thailand)":"cp-all",
+  "CPAXTRA":"cp-axtra",
+  "Lotus's":"lotus","LOTUS'S":"lotus","LOTUS's TH":"lotus","LOTUS's MY":"lotus",
+  "True":"true-cop","TRUE":"true-cop","True Leasing":"true-cop","True Properties":"true-cop",
+  "CPF":"cpf-thai","CPF THA":"cpf-thai","CPF THAI":"cpf-thai","CPF Thailand":"cpf-thai",
+  "CPF Overseas":"cpf-oversea","CPF O/S":"cpf-oversea","CPF Oversea":"cpf-oversea",
+  "Agro CHINA":"agro-china","AGRO CHINA":"agro-china","China Agro":"agro-china","Agro China":"agro-china",
+  "Non Agro China":"non-agro-china","NON-AGRO CHINA":"non-agro-china","China Non-Agro":"non-agro-china","Non-Agro China":"non-agro-china",
+  "CHINA":"china-group",
+  "CP Bangladesh":"cp-bangladesh","Bangladesh":"cp-bangladesh","CPG Myanmar":"cp-myanmar","Myanmar Bus":"cp-myanmar",
+  "CP Pakistan":"cp-pakistan","Pakistan":"cp-pakistan","Singapore (Feed)":"agro-cpg","MMR &amp; BGD":"agro-cpg","MMR & BGD":"agro-cpg",
+  "ECI":"eci","SLF":"slf","Siam Land Flying":"slf","Siam land Flying":"slf",
+  "CPFC":"cpfc","CPMC":"cpmc","FIT":"fit","FreeWill Solution":"freewill","EHSR":"era-one",
+  "Thana Digital Life":"thana-digital","THANA-TDPS":"thana-digital","THAN-TL":"true-leasing","THANA-TLR":"thana-digital",
+  "THANA-TP":"true-properties","THANA-TS":"thana-digital","THANA-W&amp;W":"ww","THANA-W&W":"ww","Wire &amp; Wireless":"ww","Wire & Wireless":"ww","Freewill":"freewill","Food Chain &amp; Coffee House":"foodchain","Food Chain & Coffee House":"foodchain","CP Medical Center (CPMC)":"cpmc","AHBG":"advance-ag","CP Consumer":"cp-consumer","China BUs":"china-group","Thana Telecom":"thana-digital","THANA TELECOM":"thana-digital","CP Crop":"cpcrop","CPTG":"cptg"
+};
+function buLogo(name){
+  const key = BU_LOGO[name];
+  return key ? `<span class="bu-mark"><img src="bu-logos/${key}.png" alt="" loading="lazy"></span>` : '';
+}
+
+// Per-BU 2017-2025 yearly trend, built from the workbook's THAILAND/CHINA/OTHER sheets (each
+// metric row summed across that BU's raw columns). China is one group-wide total.
+const BU_YEARS = [2017,2018,2019,2020,2021,2022,2023,2024,2025];
+const BU_TREND = {"CPF": {"ed01a": [275164, 265101, 306838, 307430, 331991, 343446, 344159, 362659, 386659], "ed01b": [0, 88, 328, 655, 659, 676, 676, 676, 676], "ed02": [419, 1332, 1578, 1718, 11130, 11420, 11420, 11420, 11420], "ed03": [0, 4091, 6078, 7018, 11004, 16254, 16254, 16254, 16254], "ed04": [0, 274, 591, 648, 6116, 7753, 7751, 9375, 9375], "ed05": [0, 21739287.68, 23492248.172857102, 45196010, 783335, 62660669, 0, 10095000, 0], "ed06a": [0, 2174981.2800000003, 1759279.971428571, 3957143, 654902, 12561170, 0, 0, 0], "ed06b": [0, 506, 821, 559, 0, 78, 0, 0, 0], "ed07": [0, 3124, 4734, 15001, 0, 2498, 0, 0, 0], "ed08a": [0, 0, 0, 0, 3, 286, 0, 0, 0], "ed08b": [0, 0, 0, 0, 0, 286, 0, 0, 0], "region": "Thailand"}, "True": {"ed01a": [2524544, 3020000, 919895, 3482371, 3368572, 3461042, 4583045, 5783045, 7250000], "ed01b": [0, 0, 3200000, 0, 20000000, 23020000, 25250000, 26220000, 26510000], "ed02": [406, 586, 1012, 1286, 1590, 1889, 1889, 1941, 1941], "ed03": [0, 0, 8439, 8568, 131428, 162958, 166955, 166955, 166955], "ed04": [0, 599, 1158, 1666, 2244, 2759, 2759, 2759, 2759], "ed05": [0, 5981806, 4971542, 4528752, 5704332, 7100000, 0, 0, 0], "ed06a": [0, 55150174, 255581696, 10000000, 110985977.21, 47500000, 3200000, 78000000, 0], "ed06b": [0, 399, 328, 333, 326, 300, 333, 250, 261], "ed07": [0, 12768, 19680, 49552, 49552, 45600, 7992, 4000, 11052], "ed08a": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed08b": [0, 0, 0, 0, 0, 0, 0, 0, 0], "region": "Thailand"}, "CP ALL": {"ed01a": [3673, 0, 0, 663, 0, 0, 0, 0, 0], "ed01b": [0, 35821, 6863, 47541, 101430, 111382, 115705, 128896, 129883], "ed02": [48, 0, 0, 37000, 67588, 67588, 103345, 139205, 175484], "ed03": [0, 0, 0, 0, 39893, 79505, 82306, 94729, 104866], "ed04": [19526, 28518, 34344, 39690, 76822, 105300, 150984, 200758, 215890], "ed05": [0, 966631846, 1105978842, 1412000000, 1247000000, 1114634627, 1504512329, 1325988609, 1180605099], "ed06a": [0, 1559799, 634277, 13000000, 70050000, 89650000, 0, 9540000, 3010000], "ed06b": [0, 6142, 3759, 83, 317, 370, 53, 53, 37], "ed07": [0, 63886, 17625, 3960, 29253, 31532, 2990, 2736, 2921], "ed08a": [0, 0, 0, 3030, 0, 3816, 1573, 5929, 2993], "ed08b": [0, 0, 0, 8419, 7938, 10340, 15051, 13713, 6131], "region": "Thailand"}, "CPAXTRA": {"ed01a": [0, 0, 0, 0, 0, 0, 0, 0, 3839], "ed01b": [0, 0, 0, 0, 0, 0, 0, 0, 34108], "ed02": [0, 0, 0, 0, 2500, 2620, 2620, 2620, 2620], "ed03": [0, 33600, 40003, 68350, 172832, 191700, 228974, 231429, 245893], "ed04": [55, 55, 55, 55, 120, 320, 720, 1246, 2391], "ed05": [0, 0, 0, 594124, 187500, 57047000, 60000000, 98282800, 101187300], "ed06a": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed06b": [0, 0, 0, 430, 0, 0, 0, 0, 0], "ed07": [0, 0, 0, 4300, 4358, 0, 0, 0, 0], "ed08a": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed08b": [0, 0, 0, 0, 0, 0, 0, 0, 0], "region": "Thailand"}, "LOTUS's TH": {"ed01a": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed01b": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed02": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed03": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed04": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed05": [0, 0, 0, 0, 3083096, 2751000, 12051420, 0, 0], "ed06a": [0, 0, 0, 0, 258272, 0, 3974347, 0, 0], "ed06b": [0, 0, 0, 0, 736, 0, 2173, 0, 0], "ed07": [0, 0, 0, 0, 15959, 0, 17384, 0, 0], "ed08a": [0, 0, 0, 0, 0, 0, 53, 0, 0], "ed08b": [0, 0, 0, 0, 142, 0, 0, 0, 0], "region": "Thailand"}, "CP CRT": {"ed01a": [1154, 8338, 12706, 12782, 20556, 20556, 20556, 20566, 20566], "ed01b": [0, 0, 4580, 4611, 6065, 6065, 6065, 6065, 6065], "ed02": [116, 227, 358, 453, 544, 681, 700, 729, 744], "ed03": [41, 1581, 8103, 8390, 8514, 8514, 8514, 8514, 8514], "ed04": [0, 207, 321, 483, 789, 931, 1039, 1183, 1194], "ed05": [0, 696000, 251000, 1218500, 1775292, 369999, 355536, 434255, 101000], "ed06a": [0, 4576326.0, 120266, 12600, 0, 513444, 500917, 0, 0], "ed06b": [0, 406, 964, 144, 60, 1470, 201, 165, 0], "ed07": [0, 2152, 8108, 702, 300, 2340, 879, 784, 0], "ed08a": [0, 0, 0, 0, 12, 0, 0, 0, 0], "ed08b": [0, 0, 0, 0, 38, 0, 0, 0, 0], "region": "Thailand"}, "ASCEND": {"ed01a": [0, 30, 58, 58, 58, 58, 58, 108, 108], "ed01b": [0, 0, 0, 0, 0, 0, 0, 37, 37], "ed02": [1, 11, 20, 33, 55, 96, 142, 254, 277], "ed03": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed04": [0, 0, 0, 0, 0, 0, 0, 0, 5], "ed05": [0, 0, 0, 0, 0, 0, 0, 0, 25000], "ed06a": [0, 0, 0, 0, 0, 0, 0, 260700, 0], "ed06b": [0, 0, 0, 0, 0, 0, 0, 38, 0], "ed07": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed08a": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed08b": [0, 0, 0, 0, 0, 0, 0, 0, 0], "region": "Thailand"}, "PCG": {"ed01a": [25, 0, 0, 25, 25, 25, 25, 25, 375], "ed01b": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed02": [0, 15, 50, 62, 111, 144, 179, 193, 231], "ed03": [0, 256, 256, 256, 256, 256, 256, 256, 256], "ed04": [0, 24, 52, 71, 102, 124, 142, 185, 204], "ed05": [0, 195500, 180360, 160782, 69328, 204152, 166000, 220120, 105000], "ed06a": [0, 0, 0, 0, 0, 100000, 60000, 0, 0], "ed06b": [0, 0, 0, 0, 0, 142, 100, 134, 0], "ed07": [0, 0, 0, 0, 0, 1136, 800, 1072, 0], "ed08a": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed08b": [0, 0, 0, 0, 0, 0, 0, 0, 0], "region": "Thailand"}, "CPPC": {"ed01a": [281, 281, 346, 349, 349, 349, 349, 349, 349], "ed01b": [0, 0, 17, 17, 17, 17, 17, 17, 17], "ed02": [0, 21, 40, 44, 53, 83, 83, 123, 123], "ed03": [0, 340, 340, 340, 340, 340, 340, 380, 380], "ed04": [0, 424, 526, 556, 631, 727, 727, 844, 844], "ed05": [0, 962000, 616000, 1000000, 437786, 572000, 0, 672000, 0], "ed06a": [0, 27119, 0, 0, 0, 0, 0, 10000, 0], "ed06b": [0, 130, 22, 0, 0, 0, 0, 40, 0], "ed07": [0, 1560, 58, 0, 0, 0, 0, 32, 0], "ed08a": [0, 0, 0, 2, 0, 0, 0, 0, 0], "ed08b": [0, 0, 0, 0, 0, 0, 0, 0, 0], "region": "Thailand"}, "CHIATAI": {"ed01a": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed01b": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed02": [126, 232, 328, 383, 399, 416, 433, 480, 492], "ed03": [0, 0, 0, 0, 0, 0, 12600, 19147, 19147], "ed04": [0, 79, 155, 264, 266, 269, 369, 490, 491], "ed05": [0, 554000, 609160, 795200, 571000, 854000, 112400, 1490000, 0], "ed06a": [0, 0, 0, 0, 0, 0, 1288660, 0, 0], "ed06b": [0, 0, 0, 20, 0, 0, 726, 154, 0], "ed07": [0, 0, 0, 100, 0, 750, 366, 416, 0], "ed08a": [0, 0, 0, 35, 1, 0, 0, 7, 0], "ed08b": [0, 0, 0, 0, 0, 0, 0, 12, 5], "region": "Thailand"}, "FIT": {"ed01a": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed01b": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed02": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed03": [0, 0, 0, 0, 10396, 10396, 10396, 10396, 10396], "ed04": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed05": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed06a": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed06b": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed07": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed08a": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed08b": [0, 0, 0, 0, 0, 0, 0, 0, 0], "region": "Thailand"}, "KPI-KSP": {"ed01a": [0, 0, 0, 13, 22, 22, 22, 62, 62], "ed01b": [0, 0, 0, 4, 4, 4, 4, 4, 4], "ed02": [0, 0, 0, 0, 0, 0, 6, 9, 9], "ed03": [0, 0, 0, 0, 0, 0, 0, 10, 10], "ed04": [0, 0, 0, 28, 48, 48, 48, 88, 88], "ed05": [0, 0, 0, 164042, 118642, 0, 0, 20000, 30000], "ed06a": [0, 0, 0, 0, 0, 0, 0, 85000, 30000], "ed06b": [0, 0, 0, 0, 0, 0, 40, 78, 15], "ed07": [0, 0, 0, 0, 0, 0, 320, 552, 60], "ed08a": [0, 0, 0, 0, 0, 0, 59, 1, 0], "ed08b": [0, 0, 0, 0, 0, 0, 0, 1, 0], "region": "Thailand"}, "Advance AG": {"ed01a": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed01b": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed02": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed03": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed04": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed05": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed06a": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed06b": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed07": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed08a": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed08b": [0, 0, 0, 0, 0, 0, 0, 0, 0], "region": "Thailand"}, "Advance AQ": {"ed01a": [0, 0, 0, 0, 0, 0, 0, 0, 726], "ed01b": [0, 0, 0, 5, 5, 5, 5, 5, 5], "ed02": [0, 0, 0, 1, 1, 1, 1, 1, 1], "ed03": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed04": [0, 0, 0, 5, 5, 5, 5, 5, 5], "ed05": [0, 0, 0, 29120, 0, 0, 0, 0, 0], "ed06a": [0, 0, 0, 45000, 0, 0, 0, 0, 0], "ed06b": [0, 0, 0, 15, 0, 0, 0, 0, 0], "ed07": [0, 0, 0, 2, 0, 0, 0, 0, 0], "ed08a": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed08b": [0, 0, 0, 0, 0, 0, 0, 0, 0], "region": "Thailand"}, "CP LAND": {"ed01a": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed01b": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed02": [41, 41, 41, 41, 41, 41, 137, 173, 209], "ed03": [0, 292, 292, 292, 292, 292, 292, 292, 292], "ed04": [0, 0, 0, 11, 11, 11, 42, 71, 71], "ed05": [0, 0, 0, 66246, 0, 0, 179000, 179000, 0], "ed06a": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed06b": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed07": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed08a": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed08b": [0, 0, 0, 0, 0, 0, 0, 0, 0], "region": "Thailand"}, "ECI": {"ed01a": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed01b": [0, 0, 47, 47, 47, 47, 47, 47, 47], "ed02": [0, 44, 91, 91, 91, 91, 91, 91, 91], "ed03": [0, 574, 574, 574, 574, 574, 574, 574, 574], "ed04": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed05": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed06a": [0, 10000, 0, 0, 0, 0, 0, 0, 0], "ed06b": [0, 11, 0, 0, 0, 0, 0, 0, 0], "ed07": [0, 6, 0, 0, 0, 0, 0, 0, 0], "ed08a": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed08b": [0, 0, 0, 0, 0, 0, 0, 0, 0], "region": "Thailand"}, "THANA-TP": {"ed01a": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed01b": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed02": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed03": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed04": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed05": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed06a": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed06b": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed07": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed08a": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed08b": [0, 0, 0, 0, 0, 0, 0, 0, 0], "region": "Thailand"}, "THAN-TL": {"ed01a": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed01b": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed02": [0, 0, 0, 0, 28, 44, 44, 44, 44], "ed03": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed04": [0, 0, 0, 0, 0, 240, 240, 240, 240], "ed05": [0, 0, 0, 0, 0, 1676000, 0, 0, 0], "ed06a": [0, 0, 0, 0, 160000, 0, 0, 0, 0], "ed06b": [0, 0, 0, 0, 32, 0, 0, 0, 0], "ed07": [0, 0, 0, 0, 144, 0, 0, 0, 0], "ed08a": [0, 0, 0, 0, 12, 0, 0, 0, 0], "ed08b": [0, 0, 0, 0, 56, 0, 0, 0, 0], "region": "Thailand"}, "THANA-TS": {"ed01a": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed01b": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed02": [0, 0, 0, 0, 0, 0, 0, 51, 63], "ed03": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed04": [0, 0, 0, 0, 0, 0, 0, 82, 159], "ed05": [0, 0, 0, 0, 0, 0, 0, 542000, 475000], "ed06a": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed06b": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed07": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed08a": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed08b": [0, 0, 0, 0, 0, 0, 0, 0, 0], "region": "Thailand"}, "THANA-W&amp;W": {"ed01a": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed01b": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed02": [0, 0, 0, 11, 18, 18, 18, 18, 18], "ed03": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed04": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed05": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed06a": [0, 0, 0, 0, 40000, 0, 0, 0, 0], "ed06b": [0, 0, 0, 0, 8, 0, 0, 0, 0], "ed07": [0, 0, 0, 0, 36, 0, 0, 0, 0], "ed08a": [0, 0, 0, 8, 3, 0, 0, 0, 0], "ed08b": [0, 0, 0, 8, 14, 0, 0, 0, 0], "region": "Thailand"}, "THANA-TDPS": {"ed01a": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed01b": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed02": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed03": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed04": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed05": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed06a": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed06b": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed07": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed08a": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed08b": [0, 0, 0, 0, 0, 0, 0, 0, 0], "region": "Thailand"}, "Siam land Flying": {"ed01a": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed01b": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed02": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed03": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed04": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed05": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed06a": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed06b": [0, 0, 0, 0, 0, 2, 0, 0, 0], "ed07": [0, 0, 0, 0, 0, 16, 0, 0, 0], "ed08a": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed08b": [0, 0, 0, 0, 0, 0, 0, 0, 0], "region": "Thailand"}, "CPMC": {"ed01a": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed01b": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed02": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed03": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed04": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed05": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed06a": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed06b": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed07": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed08a": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed08b": [0, 0, 0, 0, 0, 0, 0, 0, 0], "region": "Thailand"}, "CPLI": {"ed01a": [0, 0, 0, 42, 42, 101, 132, 1122, 1399], "ed01b": [0, 0, 0, 0, 0, 0, 0, 200, 550], "ed02": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed03": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed04": [0, 0, 0, 0, 0, 0, 1, 21, 41], "ed05": [0, 0, 0, 0, 0, 0, 3000, 10000, 10000], "ed06a": [0, 0, 0, 0, 0, 9052, 20000, 0, 0], "ed06b": [0, 0, 0, 31, 0, 40, 116, 106, 116], "ed07": [0, 0, 0, 168, 0, 160, 13, 16, 9], "ed08a": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed08b": [0, 0, 0, 0, 0, 0, 0, 0, 0], "region": "Thailand"}, "EHSR": {"ed01a": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed01b": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed02": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed03": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed04": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed05": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed06a": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed06b": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed07": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed08a": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed08b": [0, 0, 0, 0, 0, 0, 0, 0, 0], "region": "Thailand"}, "FreeWill Solution": {"ed01a": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed01b": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed02": [0, 0, 0, 9, 17, 17, 37, 54, 54], "ed03": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed04": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed05": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed06a": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed06b": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed07": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed08a": [0, 0, 0, 19, 26, 0, 0, 0, 0], "ed08b": [0, 0, 0, 0, 0, 0, 0, 0, 0], "region": "Thailand"}, "THANA-TLR": {"ed01a": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed01b": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed02": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed03": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed04": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed05": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed06a": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed06b": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed07": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed08a": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed08b": [0, 0, 0, 0, 0, 0, 0, 0, 0], "region": "Thailand"}, "CPFC": {"ed01a": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed01b": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed02": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed03": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed04": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed05": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed06a": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed06b": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed07": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed08a": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed08b": [0, 0, 0, 0, 0, 0, 0, 0, 0], "region": "Thailand"}, "ALL NOW": {"ed01a": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed01b": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed02": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed03": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed04": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed05": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed06a": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed06b": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed07": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed08a": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed08b": [0, 0, 0, 0, 0, 0, 0, 0, 0], "region": "Thailand"}, "Altervim": {"ed01a": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed01b": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed02": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed03": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed04": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed05": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed06a": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed06b": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed07": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed08a": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed08b": [0, 0, 0, 0, 0, 0, 0, 0, 0], "region": "Thailand"}, "LOTUS's MY": {"ed01a": [0, 0, 0, 0, 57000, 57000, 58456, 58456, 58456], "ed01b": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed02": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed03": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed04": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed05": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed06a": [0, 0, 0, 0, 2708088.05, 0, 0, 0, 0], "ed06b": [0, 0, 0, 0, 25, 0, 0, 0, 0], "ed07": [0, 0, 0, 0, 100, 0, 0, 0, 0], "ed08a": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed08b": [0, 0, 0, 0, 0, 0, 0, 0, 0], "region": "Other"}, "Bangladesh": {"ed01a": [25, 25, 25, 0, 25, 25, 25, 25, 25], "ed01b": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed02": [50, 50, 50, 0, 50, 72, 81, 81, 81], "ed03": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed04": [0, 0, 0, 0, 7, 9, 9, 9, 9], "ed05": [0, 0, 0, 0, 4700250, 1813695, 0, 0, 0], "ed06a": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed06b": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed07": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed08a": [0, 0, 0, 0, 92, 0, 160, 0, 0], "ed08b": [0, 0, 0, 0, 0, 0, 0, 0, 0], "region": "Other"}, "Myanmar Bus": {"ed01a": [0, 30, 30, 30, 30, 30, 30, 30, 30], "ed01b": [0, 0, 0, 0, 0, 15, 15, 15, 15], "ed02": [0, 80, 238, 243, 243, 243, 243, 243, 243], "ed03": [0, 274, 527, 621, 621, 621, 621, 621, 621], "ed04": [0, 2, 5, 8, 8, 11, 13, 13, 13], "ed05": [0, 2002720, 3199779, 2181000, 0, 0, 2639200, 0, 0], "ed06a": [0, 799697.674418605, 42604, 437201, 0, 0, 15631, 0, 0], "ed06b": [0, 14, 18, 18, 0, 0, 10, 0, 0], "ed07": [0, 143, 351, 144, 0, 0, 200, 0, 0], "ed08a": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed08b": [0, 0, 0, 0, 0, 0, 0, 0, 0], "region": "Other"}, "Pakistan": {"ed01a": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed01b": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed02": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed03": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed04": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed05": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed06a": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed06b": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed07": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed08a": [0, 0, 0, 0, 0, 0, 0, 0, 0], "ed08b": [0, 0, 0, 0, 0, 0, 0, 0, 0], "region": "Other"}, "CHINA": {"ed01a": [1002, 1002, 1002, 1850, 106694, 107759, 112234, 116557, 120460], "ed01b": [0, 134, 157, 1610, 8020, 13788, 18460, 22928, 27385], "ed02": [262, 262, 9331, 13046, 15698, 17896, 20821, 22700, 23665], "ed03": [0, 13, 934, 16985, 103773, 139016, 148220, 157425, 160462], "ed04": [180, 430, 468, 779, 1856, 2522, 3034, 4262, 4510], "ed05": [0, 3071000, 136091, 11935000, 10529976.4, 5945630, 6601735, 5139536, 1812778], "ed06a": [0, 71600125, 121553282, 45300000, 119969588.2, 45423111, 128772645, 1728749, 232534], "ed06b": [0, 582, 868, 562, 776, 1802, 1310, 1251, 273], "ed07": [0, 3127, 2957, 2351, 4789.2, 5478, 7411, 11348, 1938], "ed08a": [0, 0, 0, 3873, 3118, 2039, 4727, 2053, 1351], "ed08b": [0, 0, 0, 0, 3789, 1568, 2496, 542, 2689], "region": "China"}};
+const BU_ORDER = ["CPF","True","CP ALL","CPAXTRA","LOTUS's TH","CP CRT","ASCEND","PCG","CPPC","CHIATAI","FIT","KPI-KSP","Advance AG","Advance AQ","CP LAND","ECI","THANA-TP","THAN-TL","THANA-TS","THANA-W&amp;W","THANA-TDPS","Siam land Flying","CPMC","CPLI","EHSR","FreeWill Solution","THANA-TLR","CPFC","ALL NOW","Altervim","LOTUS's MY","Bangladesh","Myanmar Bus","Pakistan","CHINA"];
+
+const DATA = {"goal": 50000000, "overallPct": 72, "trend": [{"year": 2017, "value": 2829487}, {"year": 2018, "value": 3410089}, {"year": 2019, "value": 4576464}, {"year": 2020, "value": 4080240}, {"year": 2021, "value": 24683501}, {"year": 2022, "value": 27992557}, {"year": 2023, "value": 31514354}, {"year": 2024, "value": 33862796}, {"year": 2025, "value": 35794787}], "byCategory": [{"name": "Access to learning resources &amp; information", "value": 26709042}, {"name": "Access to education", "value": 7845692}, {"name": "Relevant skills", "value": 762080}, {"name": "Scholarship", "value": 260077}, {"name": "Trainee", "value": 217896}], "byCountry": [{"name": "Thailand", "value": 35357004}, {"name": "China", "value": 336482}, {"name": "Others", "value": 101301}], "impact2025": [{"n": "702", "l": "Employees volunteered in education activities"}, {"n": "15,980", "l": "Volunteer hours contributed"}, {"n": "4,344", "l": "People got full-time jobs after completing programs"}, {"n": "฿ 1,317M", "l": "Total scholarship value granted"}], "programs": [{"name": "Trueplookpanya website", "metric": "32M active users"}, {"name": "Trueplookpanya TV &amp; App", "metric": "4M viewers"}, {"name": "Makro HoReCa Academy", "metric": "700K active users"}, {"name": "CONNEXT ED", "metric": "13M persons &middot; 82K educators developed"}, {"name": "Trainee programs (all BUs)", "metric": "180K persons"}, {"name": "Scholarship programs (all BUs)", "metric": "247K persons"}]};
+
+// ED-01..ED-08 metric grouping/labels/units, used to render the per-Business-Unit KPI breakdown
+const ED_GROUPS = [
+  {code:'ED-01', title:'Access to Quality Education', metrics:[
+    {key:'ed01a', label:'Children supported &middot; pre-primary / primary / secondary', unit:'persons'},
+    {key:'ed01b', label:'Youth &amp; adults supported &middot; upper secondary / vocational / tertiary', unit:'persons'},
+  ]},
+  {code:'ED-02', title:'Promote Lifelong Learning Opportunities for All', metrics:[
+    {key:'ed02', label:'Trainees', unit:'persons'},
+  ]},
+  {code:'ED-03', title:'Relevant Skills, Decent Jobs &amp; Entrepreneurship', metrics:[
+    {key:'ed03', label:'People supported to gain relevant skills, decent jobs or entrepreneurship', unit:'persons'},
+  ]},
+  {code:'ED-04', title:'Scholarship &middot; Recipients', metrics:[
+    {key:'ed04', label:'Students receiving scholarship', unit:'persons'},
+  ]},
+  {code:'ED-05', title:'Scholarship &middot; Value Granted', metrics:[
+    {key:'ed05', label:'Total scholarship value granted', unit:'&#3647;'},
+  ]},
+  {code:'ED-06', title:'Philanthropic Activity', metrics:[
+    {key:'ed06a', label:'Donations for education infrastructure &amp; events', unit:'&#3647;'},
+    {key:'ed06b', label:'Employees volunteered', unit:'persons'},
+  ]},
+  {code:'ED-07', title:'Employee Volunteer Hours', metrics:[
+    {key:'ed07', label:'Volunteer hours contributed', unit:'hours'},
+  ]},
+  {code:'ED-08', title:'Reduce Unemployment Rate', metrics:[
+    {key:'ed08a', label:'Got full-time job after completing programs', unit:'persons'},
+    {key:'ed08b', label:'Completed a study program &middot; any level', unit:'persons'},
+  ]},
+];
+
+function fmtShort(v, digits){
+  digits = digits === undefined ? 1 : digits;
+  const abs = Math.abs(v);
+  let out;
+  if(abs >= 1e9) out = (v/1e9).toFixed(digits) + 'B';
+  else if(abs >= 1e6) out = (v/1e6).toFixed(digits) + 'M';
+  else if(abs >= 1e3) out = (v/1e3).toFixed(digits) + 'K';
+  else out = String(v);
+  return out;
+}
+
+function setRing(ring, valEl, pct){
+  ring.style.setProperty('--pct', pct);
+  valEl.textContent = pct + '%';
+}
+
+function render(){
+  setRing(document.getElementById('heroRing'), document.getElementById('heroVal'), DATA.overallPct);
+  document.getElementById('goalChip').textContent = fmtShort(DATA.goal) + ' persons';
+
+  const trendRow = document.getElementById('trendRow');
+  trendRow.innerHTML = '';
+  const maxH = 120;
+  const maxV = Math.max(...DATA.trend.map(t=>t.value));
+  DATA.trend.forEach((t,i)=>{
+    const col = document.createElement('div');
+    col.className = 'trend-col' + (i===DATA.trend.length-1 ? ' is-last' : '');
+    const h = Math.max(4, Math.round(maxH * t.value/maxV));
+    col.innerHTML = `
+      <div class="trend-val">${fmtShort(t.value)}</div>
+      <div class="trend-bar-wrap"><div class="trend-bar" style="height:${h}px"></div></div>
+      <div class="trend-year">${t.year}</div>`;
+    trendRow.appendChild(col);
+  });
+
+  function renderBarList(containerId, items){
+    const c = document.getElementById(containerId);
+    c.innerHTML = '';
+    const max = Math.max(...items.map(i=>i.value));
+    items.forEach(it=>{
+      const row = document.createElement('div');
+      row.className = 'bar-row2';
+      const pct = Math.round(it.value/max*100);
+      row.innerHTML = `
+        <div class="bar-row2-top"><span class="name">${it.name}</span><span class="val">${it.value.toLocaleString()}</span></div>
+        <div class="bar-row2-track"><div class="bar-row2-fill" style="width:${pct}%"></div></div>`;
+      c.appendChild(row);
+    });
+  }
+  renderBarList('catList', DATA.byCategory);
+  renderBarList('countryList', DATA.byCountry);
+
+  const impactGrid = document.getElementById('impactGrid');
+  impactGrid.innerHTML = '';
+  DATA.impact2025.forEach(s=>{
+    const tile = document.createElement('div');
+    tile.className = 'stat-tile';
+    tile.innerHTML = `<div class="n">${s.n}</div><div class="l">${s.l}</div>`;
+    impactGrid.appendChild(tile);
+  });
+
+  const progList = document.getElementById('progList');
+  progList.innerHTML = '';
+  DATA.programs.forEach(p=>{
+    const row = document.createElement('div');
+    row.className = 'prog-item';
+    row.innerHTML = `<span class="name">${p.name}</span><span class="metric">${p.metric}</span>`;
+    progList.appendChild(row);
+  });
+}
+
+const themeBtn = document.getElementById('themeBtn');
+function applyTheme(t){
+  if(t){ document.documentElement.setAttribute('data-theme', t); localStorage.setItem('cp-heart-theme', t); }
+}
+(function initTheme(){
+  try{
+    const saved = localStorage.getItem('cp-heart-theme');
+    if(saved) document.documentElement.setAttribute('data-theme', saved);
+  }catch(e){}
+})();
+themeBtn.addEventListener('click', function(){
+  const cur = document.documentElement.getAttribute('data-theme');
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const effectiveDark = cur ? cur==='dark' : prefersDark;
+  applyTheme(effectiveDark ? 'light' : 'dark');
+});
+
+render();
+
+// ---- Business Unit tab: region filter, BU picker, per-BU yearly trend ----
+let currentRegion = 'All';
+let currentBu = null;
+
+function regionCount(region){
+  if(region==='All') return BU_ORDER.length;
+  return BU_ORDER.filter(n=>BU_TREND[n].region===region).length;
+}
+
+function renderRegionRow(){
+  const row = document.getElementById('regionRow');
+  row.innerHTML = '';
+  ['All','Thailand','China','Other'].forEach(r=>{
+    const btn = document.createElement('button');
+    btn.className = 'region-chip';
+    btn.type = 'button';
+    btn.setAttribute('aria-pressed', r===currentRegion ? 'true' : 'false');
+    btn.textContent = `${r} (${regionCount(r)})`;
+    btn.addEventListener('click', ()=>{ currentRegion = r; renderRegionRow(); renderBuGrid(); });
+    row.appendChild(btn);
+  });
+}
+
+function buInitials(name){
+  const clean = name.replace(/&amp;/g,'&').replace(/[^A-Za-z0-9]+/g,' ').trim();
+  const parts = clean.split(' ').filter(Boolean);
+  return (parts.length>1 ? parts[0][0]+parts[1][0] : clean.slice(0,2)).toUpperCase();
+}
+function renderBuGrid(){
+  const grid = document.getElementById('buGrid');
+  grid.innerHTML = '';
+  const names = currentRegion==='All' ? BU_ORDER : BU_ORDER.filter(n=>BU_TREND[n].region===currentRegion);
+  names.forEach(n=>{
+    const btn = document.createElement('button');
+    btn.className = 'bu-tile';
+    btn.type = 'button';
+    btn.setAttribute('aria-pressed', n===currentBu ? 'true' : 'false');
+    const logoKey = BU_LOGO[n];
+    const logoHtml = logoKey
+      ? `<span class="bu-tile-logo"><img src="bu-logos/${logoKey}.png" alt="" loading="lazy"></span>`
+      : `<span class="bu-tile-logo bu-tile-fallback">${buInitials(n)}</span>`;
+    btn.innerHTML = `${logoHtml}<span class="bu-tile-name">${n}</span>`;
+    btn.addEventListener('click', ()=>{ currentBu = n; renderBuGrid(); renderBuDetail(n); });
+    grid.appendChild(btn);
+  });
+}
+
+function yearBars(values){
+  const max = Math.max(...values, 1);
+  const maxH = 92;
+  let html = '<div class="bu-scroll"><div class="bu-row">';
+  values.forEach((v,i)=>{
+    const h = v>0 ? Math.max(4, Math.round(maxH*v/max)) : 2;
+    html += `
+      <div class="bu-col">
+        <div class="bu-pct">${fmtShort(v)}</div>
+        <div class="bu-bar-wrap" style="height:${maxH}px;"><div class="bu-bar" style="height:${h}px; width:26px;"></div></div>
+        <div class="bu-name">${BU_YEARS[i]}</div>
+      </div>`;
+  });
+  html += '</div></div>';
+  return html;
+}
+
+function renderBuDetail(name){
+  const t = BU_TREND[name];
+  document.getElementById('buEmptySection').style.display = 'none';
+  const section = document.getElementById('buDetailSection');
+  section.style.display = '';
+  const card = document.getElementById('buDetailCard');
+  const mark = buLogo(name) || '<span class="bu-mark" style="background:var(--surface-alt);"></span>';
+
+  let html = `
+    <div class="bu-detail-head">
+      ${mark}
+      <div><div class="nm">${name}</div><div class="rg">${t.region}</div></div>
+    </div>`;
+
+  ED_GROUPS.forEach((g, gi)=>{
+    html += `<div class="kpi-group"${gi>0?' style="margin-top:6px;"':''}>`;
+    html += `<div class="kpi-group-head"><span class="kpi-code">${g.code}</span><span class="kpi-group-title">${g.title}</span></div>`;
+    g.metrics.forEach(m=>{
+      const vals = t[m.key];
+      const hasData = Math.max(...vals) > 0;
+      html += `<div class="mini-h" style="margin-top:10px;">${m.label} &middot; ${m.unit} by year</div>`;
+      html += hasData ? yearBars(vals) : `<div class="bu-nodata">ไม่มีข้อมูล ${m.label.replace(/&middot;.*/,'').trim()} ที่บันทึกไว้ในช่วงปี 2017&ndash;2025</div>`;
+    });
+    html += `</div>`;
+  });
+
+  card.innerHTML = html;
+}
+
+renderRegionRow();
+renderBuGrid();
+
+// ---- Tab switching ----
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click', function(){
+    document.querySelectorAll('.tab-btn').forEach(b=>b.setAttribute('aria-selected', b===btn ? 'true' : 'false'));
+    const tab = btn.dataset.tab;
+    document.getElementById('panel-summary').classList.toggle('active', tab==='summary');
+    document.getElementById('panel-bu').classList.toggle('active', tab==='bu');
+  });
+});
+</script>
+</body>
+</html>

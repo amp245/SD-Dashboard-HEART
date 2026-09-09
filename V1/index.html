@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CP Group — Heart: Living Right 2020–2025</title>
+<meta name="description" content="CP Group Sustainability Development — HEART: Living Right. Human Rights, Education, Leadership, Cybersecurity, Corporate Governance.">
+<meta name="theme-color" content="#2a0a1c">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="CP HEART">
+<style>
+  :root{
+    --pink-900:#3d0c26;
+    --pink-800:#6b1440;
+    --pink-700:#a01e59;
+    --pink-500:#ff6699;
+    --ink:#ffffff;
+    --ink-soft:rgba(255,255,255,.78);
+    --card-radius:14px;
+  }
+  *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body{ margin:0; padding:0; }
+  body{
+    min-height:100svh;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue","Noto Sans Thai",Arial,sans-serif;
+    color:var(--ink);
+    background:#1a0611;
+    /* Team photo sits behind everything; the dark pink scrim keeps text legible
+       regardless of how the photo crops at a given viewport size. */
+    background-image:
+      linear-gradient(180deg, rgba(23,5,15,.76) 0%, rgba(23,5,15,.58) 45%, rgba(23,5,15,.85) 100%),
+      url("hero-heart.jpg");
+    background-size:cover;
+    background-position:center;
+    background-attachment:scroll;
+    background-repeat:no-repeat;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{
+    max-width:1180px;
+    margin:0 auto;
+    padding:clamp(18px,4vw,40px) clamp(16px,4vw,36px) calc(clamp(18px,4vw,40px) + env(safe-area-inset-bottom));
+    min-height:100svh;
+    display:flex;
+    flex-direction:column;
+    gap:clamp(18px,3vw,32px);
+  }
+
+  /* ---------- Title panel ---------- */
+  .hero{
+    position:relative;
+    overflow:hidden;
+    isolation:isolate;
+    background:linear-gradient(135deg, rgba(61,12,38,.94) 0%, rgba(160,30,89,.82) 100%);
+    border-radius:var(--card-radius);
+    padding:clamp(20px,4vw,38px);
+    box-shadow:0 10px 40px rgba(0,0,0,.45);
+    border:1px solid rgba(255,255,255,.10);
+  }
+  .hero .bg-video{
+    position:absolute; inset:0;
+    width:100%; height:100%;
+    object-fit:cover;
+    z-index:0;
+  }
+  .hero::after{
+    content:"";
+    position:absolute; inset:0;
+    background:linear-gradient(90deg, rgba(23,4,13,.90) 0%, rgba(23,4,13,.62) 42%, rgba(23,4,13,.20) 72%, rgba(23,4,13,.08) 100%);
+    z-index:1;
+  }
+  .hero > *:not(.bg-video){
+    position:relative;
+    z-index:2;
+    text-shadow:0 1px 10px rgba(0,0,0,.55);
+  }
+  .hero img.logo{
+    width:clamp(52px,7vw,74px);
+    height:auto;
+    display:block;
+    margin-bottom:clamp(12px,2vw,18px);
+    filter:brightness(0) invert(1);
+  }
+  .eyebrow{
+    font-size:clamp(13px,2vw,17px);
+    font-weight:400;
+    letter-spacing:.01em;
+    color:var(--ink-soft);
+    margin:0 0 2px;
+  }
+  h1{
+    margin:0;
+    font-size:clamp(26px,6.2vw,54px);
+    line-height:1.06;
+    font-weight:800;
+    letter-spacing:-.01em;
+  }
+  h1 .light{ font-weight:300; display:block; }
+  .years{
+    margin-top:clamp(8px,1.6vw,14px);
+    font-size:clamp(18px,3.4vw,30px);
+    font-weight:300;
+    color:var(--ink-soft);
+    letter-spacing:.04em;
+  }
+
+  /* ---------- Cards ---------- */
+  .cards{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:clamp(12px,2vw,18px);
+  }
+  /* Three-across once each card is wide enough for a one-line title (matches
+     the Home template's measured breakpoint). Five cards wrap to 3+2. */
+  @media (min-width:1000px){
+    .wrap{ justify-content:center; }
+    .cards{ grid-template-columns:repeat(3,1fr); }
+  }
+  a.card{
+    position:relative;
+    display:block;
+    border-radius:var(--card-radius);
+    overflow:hidden;
+    text-decoration:none;
+    color:var(--ink);
+    min-height:clamp(132px,26vw,220px);
+    border:1px solid rgba(255,255,255,.12);
+    box-shadow:0 8px 26px rgba(0,0,0,.42);
+    transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+    isolation:isolate;
+  }
+  a.card img.shot{
+    position:absolute; inset:0;
+    width:100%; height:100%;
+    object-fit:cover;
+    z-index:0;
+    transition:transform .35s ease;
+  }
+  a.card.no-photo{
+    background:linear-gradient(135deg, var(--pink-800) 0%, var(--pink-700) 55%, var(--pink-500) 130%);
+  }
+  a.card.no-photo .pattern{
+    position:absolute; inset:0; z-index:0;
+    opacity:.16;
+    background-image:radial-gradient(circle at 20% 20%, #fff 0, transparent 35%),
+                      radial-gradient(circle at 80% 70%, #fff 0, transparent 40%);
+  }
+  a.card.no-photo .glyph{
+    position:absolute; right:12px; top:12px; z-index:1;
+    width:clamp(34px,6vw,46px); height:clamp(34px,6vw,46px);
+    opacity:.5;
+  }
+  a.card::after{
+    content:"";
+    position:absolute; inset:0;
+    background:linear-gradient(180deg, rgba(0,0,0,.06) 40%, rgba(0,0,0,.72) 100%);
+    z-index:1;
+  }
+  a.card .label{
+    position:absolute;
+    left:0; right:0; bottom:0;
+    z-index:2;
+    padding:clamp(12px,2vw,18px) clamp(14px,2.2vw,20px);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+  }
+  a.card .label .txt{ min-width:0; }
+  a.card .name{
+    display:block;
+    font-size:clamp(14px,2.4vw,17px);
+    font-weight:700;
+    letter-spacing:.05em;
+    text-transform:uppercase;
+    text-shadow:0 1px 8px rgba(0,0,0,.6);
+  }
+  a.card .sub{
+    display:block;
+    margin-top:3px;
+    font-size:clamp(11px,1.8vw,12.5px);
+    font-weight:400;
+    color:var(--ink-soft);
+    text-shadow:0 1px 8px rgba(0,0,0,.6);
+  }
+  a.card .arrow{
+    flex:0 0 auto;
+    width:30px; height:30px;
+    border-radius:50%;
+    background:rgba(255,255,255,.16);
+    border:1px solid rgba(255,255,255,.34);
+    display:flex; align-items:center; justify-content:center;
+    font-size:15px; line-height:1;
+    backdrop-filter:blur(3px);
+    -webkit-backdrop-filter:blur(3px);
+    transition:background .18s ease;
+  }
+  @media (hover:hover){
+    a.card:hover{ transform:translateY(-3px); box-shadow:0 14px 34px rgba(0,0,0,.55); border-color:rgba(255,255,255,.34); }
+    a.card:hover img.shot{ transform:scale(1.05); }
+    a.card:hover .arrow{ background:rgba(255,255,255,.32); }
+  }
+  a.card:active{ transform:translateY(0) scale(.995); }
+  a.card:focus-visible{ outline:3px solid #ff9dbf; outline-offset:3px; }
+
+  footer{
+    text-align:center;
+    font-size:clamp(10.5px,1.6vw,12px);
+    color:rgba(255,255,255,.55);
+    padding-top:2px;
+  }
+  footer .dot{ opacity:.5; margin:0 6px; }
+  @media (prefers-reduced-motion: reduce){
+    .hero .bg-video{ display:none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <video class="bg-video" autoplay muted loop playsinline poster="hero-heart.jpg" aria-hidden="true">
+      <source src="bg-video.mp4" type="video/mp4">
+    </video>
+    <img class="logo" src="cp-logo.png" alt="C.P. Group">
+    <p class="eyebrow">Sustainability Development</p>
+    <h1>HEART<span class="light">LIVING RIGHT</span></h1>
+    <div class="years">2020&ndash;2025</div>
+  </header>
+
+  <nav class="cards">
+    <a class="card" href="governance.html">
+      <img class="shot" src="card-cg.jpg" alt="" loading="eager" decoding="async">
+      <span class="label">
+        <span class="txt">
+          <span class="name">CORPORATE GOVERNANCE</span>
+          <span class="sub">Maturity assessment &middot; Policy &middot; Structure</span>
+        </span>
+        <span class="arrow" aria-hidden="true">&rsaquo;</span>
+      </span>
+    </a>
+
+    <a class="card" href="human-rights.html">
+      <img class="shot" src="card-humanrights.jpg" alt="" loading="eager" decoding="async">
+      <span class="label">
+        <span class="txt">
+          <span class="name">HUMAN RIGHTS &amp; LABOR</span>
+          <span class="sub">HRDD maturity &middot; Due diligence &middot; Grievance</span>
+        </span>
+        <span class="arrow" aria-hidden="true">&rsaquo;</span>
+      </span>
+    </a>
+
+    <a class="card" href="education.html">
+      <img class="shot" src="card-education.jpg" alt="" loading="lazy" decoding="async">
+      <span class="label">
+        <span class="txt">
+          <span class="name">EDUCATION &amp; INEQUALITY</span>
+          <span class="sub">Reach by country &middot; By business unit</span>
+        </span>
+        <span class="arrow" aria-hidden="true">&rsaquo;</span>
+      </span>
+    </a>
+
+    <a class="card" href="leadership.html">
+      <img class="shot" src="card-leadership.jpg" alt="" loading="lazy" decoding="async">
+      <span class="label">
+        <span class="txt">
+          <span class="name">LEADERSHIP &amp; HUMAN CAPITAL</span>
+          <span class="sub">Training &middot; Engagement &middot; Development</span>
+        </span>
+        <span class="arrow" aria-hidden="true">&rsaquo;</span>
+      </span>
+    </a>
+
+    <a class="card" href="cybersecurity.html">
+      <img class="shot" src="card-cybersecurity.jpg" alt="" loading="lazy" decoding="async">
+      <span class="label">
+        <span class="txt">
+          <span class="name">CYBERSECURITY &amp; DATA</span>
+          <span class="sub">Maturity &middot; Certification &middot; Awareness</span>
+        </span>
+        <span class="arrow" aria-hidden="true">&rsaquo;</span>
+      </span>
+    </a>
+  </nav>
+
+  <footer>
+    C.P. Group &mdash; Sustainability Development
+    <span class="dot">&middot;</span>
+    HEART: Living Right 2020&ndash;2025
+  </footer>
+
+</div>
+</body>
+</html>
